@@ -1,0 +1,22 @@
+{
+  "name": "noisy",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./dist/index.js",
+  "scripts": {
+    "dev": "tsc && node ."
+  },
+  "keywords": [],
+  "author": "KolAbuk",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.10.4",
+    "@types/node-fetch": "^2.6.9",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "@kolabuk/logger": "^1.0.5",
+    "node-fetch": "^2.7.0",
+    "node-html-parser": "^6.1.11"
+  }
+}
