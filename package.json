@@ -16,7 +16,7 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "@kolabuk/logger": "^1.0.5",
+    "@kolabuk/logger": "^1.0.6",
     "node-fetch": "^2.7.0",
     "node-html-parser": "^6.1.11",
     "random-useragent": "^0.5.0"

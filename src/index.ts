@@ -14,7 +14,6 @@ const openUrl = async (url: string): Promise<string[]> => {
       .querySelectorAll("a")
       .map((el) => el.getAttribute("href") || "")
       .filter((el) => el.includes("http"));
-
     return urls.slice(0, 20);
   } catch (e) {
     throw e;
@@ -25,36 +24,31 @@ const openUrl = async (url: string): Promise<string[]> => {
   const logger = new Logger({
     filePath: "./data/logs/index.txt",
     errorFilePath: "./data/logs/index.err.txt",
+    debugMode: config.debugMode,
   });
   try {
     let sites: string[] = config.sites;
     const blacklist: string[] = config.blacklist;
-    let i = 0;
-    while (i < sites.length) {
+    while (sites.length) {
       try {
-        logger.success(`Open ${sites[i]}`);
-        const urls = await openUrl(sites[i]);
-        sites = [...sites, ...urls];
+        const site = sites.shift();
+        if (!site) continue;
+        logger.success(`Open ${site}`);
+        const urls = await openUrl(site);
+        sites = [...sites, ...urls].slice(0, 500);
         sites = sites.filter(
           (el, id, arr) => id == arr.lastIndexOf(el) && el.trim() != ""
         );
         for (let o = 0; o < blacklist.length; o++) {
           sites = sites.filter((el) => !el.includes(blacklist[o]));
         }
-        if (i % 5 == 0) {
-          logger.log(`Sites len ${sites.length}`);
-        }
       } catch (err: any) {
         logger.warn(err.message);
       } finally {
-        const timeout = Math.ceil(Math.random() * 7000);
+        const timeout = Math.ceil(Math.random() * config.timeoutMax);
         logger.success(`Timeout ${timeout} ms`);
         await new Promise((res) => setTimeout(res, timeout));
-        if (i == sites.length - 1) {
-          i = 0;
-        } else {
-          i++;
-        }
+        logger.debug(sites.length);
       }
     }
   } catch (e: any) {

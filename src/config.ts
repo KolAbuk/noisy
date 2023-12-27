@@ -1,4 +1,6 @@
 export const config = {
+  debugMode: false,
+  timeoutMax: 3000,
   sites: [
     "http://4chan.org",
     "https://www.reddit.com",
