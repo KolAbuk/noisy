@@ -5,6 +5,7 @@ import { parse } from "node-html-parser";
 import { getRandom } from "random-useragent";
 
 //
+
 const openUrl = async (url: string): Promise<string[]> => {
   try {
     const res = await fetch(url, { headers: { "User-Agent": getRandom() } });
@@ -19,6 +20,37 @@ const openUrl = async (url: string): Promise<string[]> => {
     throw e;
   }
 };
+const shuffle = <T>(array: T[]): T[] => {
+  try {
+    let currentIndex = array.length,
+      randomIndex = 0;
+    while (currentIndex != 0) {
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex--;
+      [array[currentIndex], array[randomIndex]] = [
+        array[randomIndex],
+        array[currentIndex],
+      ];
+    }
+    return array;
+  } catch (e) {
+    throw e;
+  }
+};
+
+const filterUrls = (urls: string[], blacklist: string[]): string[] => {
+  try {
+    urls = urls.filter(
+      (el, id, arr) => id == arr.lastIndexOf(el) && el.trim() != ""
+    );
+    for (let o = 0; o < blacklist.length; o++) {
+      urls = urls.filter((el) => !el.includes(blacklist[o]));
+    }
+    return urls;
+  } catch (e) {
+    throw e;
+  }
+};
 
 (async () => {
   const logger = new Logger({
@@ -28,22 +60,19 @@ const openUrl = async (url: string): Promise<string[]> => {
   });
   try {
     let sites: string[] = config.sites;
-    const blacklist: string[] = config.blacklist;
     while (sites.length) {
+      let site: string | undefined;
       try {
-        const site = sites.shift();
+        site = sites.shift();
         if (!site) continue;
         logger.success(`Open ${site}`);
         const urls = await openUrl(site);
-        sites = [...sites, ...urls].slice(0, 500);
-        sites = sites.filter(
-          (el, id, arr) => id == arr.lastIndexOf(el) && el.trim() != ""
-        );
-        for (let o = 0; o < blacklist.length; o++) {
-          sites = sites.filter((el) => !el.includes(blacklist[o]));
-        }
+        sites = filterUrls(
+          shuffle([...sites, ...urls]),
+          config.blacklist
+        ).slice(0, 500);
       } catch (err: any) {
-        logger.warn(err.message);
+        logger.warn(`${err.message} ${site}`);
       } finally {
         const timeout = Math.ceil(Math.random() * config.timeoutMax);
         logger.success(`Timeout ${timeout} ms`);
